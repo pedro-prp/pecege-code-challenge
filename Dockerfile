@@ -14,4 +14,6 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN chmod +x wait_for_mysql.sh
+
 EXPOSE 8000
