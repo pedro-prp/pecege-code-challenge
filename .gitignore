@@ -6,7 +6,7 @@ __pycache__/
 .python-version
 
 # ENV file
-.env/
+.env
 
 # Vscode
 .vscode/
