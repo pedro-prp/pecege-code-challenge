@@ -1,4 +1,5 @@
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
+from io import BytesIO
 
 from .repositories import PersonRepository
 from .serializers import PersonSerializer
@@ -60,4 +61,35 @@ class PersonService:
     def generate_spreadsheet(self):
         data = self.__repository.get_all()
 
-        return data
+        workbook = Workbook()
+        worksheet = workbook.active
+
+        worksheet.title = "Pessoas"
+
+        column_names = [
+            "Nome",
+            "Email",
+            "Data de Nascimento",
+            "Ativo",
+            "Valor",
+        ]
+
+        worksheet.append(column_names)
+
+        for person in data:
+            worksheet.append(
+                [
+                    person["name"],
+                    person["email"],
+                    person["birth_date"].strftime("%d/%m/%Y"),
+                    person["is_active"],
+                    float(person["value"]),
+                ]
+            )
+
+        output_file = BytesIO()
+        workbook.save(output_file)
+
+        output_file.seek(0)
+
+        return output_file

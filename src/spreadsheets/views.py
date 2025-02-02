@@ -2,8 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-# TODO: setup admin
+from django.http import HttpResponse
 
 from .serializers import PersonSerializer
 from .services import PersonService
@@ -49,9 +48,20 @@ class PersonListSpreadsheetView(APIView):
 
     def get(self, request):
 
-        data = self.__service.generate_spreadsheet()
+        try:
+            response_file = self.__service.generate_spreadsheet()
 
-        return Response(
-            data=data,
-            status=status.HTTP_200_OK,
-        )
+            response = HttpResponse(
+                response_file.getvalue(),
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+
+            response["Content-Disposition"] = "attachment; filename=pessoas.xlsx"
+
+            return response
+
+        except Exception as e:
+            return Response(
+                data={"Erro ao gerar a planilha": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
