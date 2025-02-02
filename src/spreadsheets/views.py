@@ -7,6 +7,8 @@ from django.http import HttpResponse
 from .serializers import PersonSerializer
 from .services import PersonService
 
+from .exceptions import SpreadsheetHeaderException
+
 
 # TODO: Implement swagger_auto_schema decorator
 # from drf_yasg.utils import swagger_auto_schema
@@ -23,15 +25,31 @@ class PersonProcessSpreadsheetView(APIView):
         try:
             file = request.FILES.get("file")
 
-            processed_data = self.__service.process_spreadsheet(file)
+            processed_data, error = self.__service.process_spreadsheet(file)
 
             serializer = PersonSerializer(data=processed_data, many=True)
 
             if serializer.is_valid():
+                response_data = {"result": serializer.data}
+                if error:
+                    response_data["errors"] = error
+
                 return Response(
-                    data=serializer.data,
+                    data=response_data,
                     status=status.HTTP_201_CREATED,
                 )
+
+        except AttributeError:
+            return Response(
+                data={"Erro ao processar a planilha": "O arquivo não foi enviado."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        except SpreadsheetHeaderException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         except Exception as e:
             return Response(

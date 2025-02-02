@@ -4,6 +4,8 @@ from io import BytesIO
 from .repositories import PersonRepository
 from .serializers import PersonSerializer
 
+from .exceptions import SpreadsheetHeaderException, InvalidBirthDateException
+
 from .utils import calculate_age, calculate_value
 
 from datetime import datetime
@@ -18,16 +20,19 @@ class PersonService:
         worksheet = workbook.active
 
         processed_data = []
+        error_lines = []
 
         for row in worksheet.iter_rows(min_row=2, values_only=True):
             if not row or all(cell is None for cell in row):
                 continue
 
             try:
-                name, email, birth_date, is_active, _ = row
+                name, email, birth_date, is_active = row[:4]
 
-                if isinstance(birth_date, datetime):
-                    birth_date = birth_date.date()
+                if not isinstance(birth_date, datetime):
+                    raise InvalidBirthDateException()
+
+                birth_date = birth_date.date()
 
                 age = calculate_age(birth_date)
 
@@ -51,12 +56,19 @@ class PersonService:
 
                 if is_active:
                     processed_data.append(person)
+            except InvalidBirthDateException:
+                error_message = f"Erro ao processar a linha: {row}. Data de nascimento com formato inválido."
+
+                error_lines.append(error_message)
+
+            except ValueError:
+                raise SpreadsheetHeaderException()
 
             except Exception as e:
-                print(f"Erro ao processar a linha: {row}. Error: {e}")
+                print(f"Erro ao processar a linha: {row}. Error: {e}. Type: {type(e)}")
                 continue
 
-        return processed_data
+        return processed_data, error_lines
 
     def generate_spreadsheet(self):
         data = self.__repository.get_all()

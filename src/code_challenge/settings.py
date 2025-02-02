@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -86,6 +87,12 @@ DATABASES = {
         "PORT": os.getenv("MYSQL_PORT", "3306"),
     }
 }
+
+if "test" in sys.argv:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",  # Ou ":memory:" para banco em memória
+    }
 
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_key")
