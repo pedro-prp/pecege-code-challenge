@@ -9,9 +9,8 @@ from .services import PersonService
 
 from .exceptions import SpreadsheetHeaderException
 
-
-# TODO: Implement swagger_auto_schema decorator
-# from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
+from .swagger_schemas import get_upload_planilha_schema, get_download_planilha_schema
 
 
 class PersonProcessSpreadsheetView(APIView):
@@ -20,6 +19,7 @@ class PersonProcessSpreadsheetView(APIView):
         super().__init__(**kwargs)
         self.__service = PersonService()
 
+    @swagger_auto_schema(**get_upload_planilha_schema())
     def post(self, request):
 
         try:
@@ -64,6 +64,7 @@ class PersonListSpreadsheetView(APIView):
         super().__init__(**kwargs)
         self.__service = PersonService()
 
+    @swagger_auto_schema(**get_download_planilha_schema())
     def get(self, request):
 
         try:
