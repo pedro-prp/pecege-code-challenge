@@ -9,9 +9,22 @@ from .factories import (
 
 from rest_framework.test import APITestCase
 
+from django.contrib.auth.models import User
+
+import base64
+
 
 class TestPersonProcessSpreadsheetView(APITestCase):
     def setUp(self):
+        # Criação do usuário para autenticação
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
+
+        credentials = f"{self.user.username}:testpassword"
+        base64_credentials = base64.b64encode(credentials.encode()).decode()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Basic {base64_credentials}")
+
         self.valid_file = ValidSpreadsheetFactory.generate()
         self.valid_file_minor = ValidSpreadsheetFactory.generate_minor()
         self.invalid_missing_columns_file = (
@@ -61,6 +74,14 @@ class TestPersonProcessSpreadsheetView(APITestCase):
 
 class TestPersonListSpreadsheetView(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
+
+        credentials = f"{self.user.username}:testpassword"
+        base64_credentials = base64.b64encode(credentials.encode()).decode()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Basic {base64_credentials}")
+
         Person.objects.create(
             name="João Silva",
             email="joao@example.com",
