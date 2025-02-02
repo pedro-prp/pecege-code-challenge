@@ -1,13 +1,9 @@
-# from openpyxl import load_workbook, Workbook
-
-# class PersonRepository:
-#     def __init__(self, person_model, person_serializer):
-#         self.__person_model = person_model
-#         # self.__person_serializer = person_serializer
-
-#     def process_spreadsheet(self, data):
-
-#     def __create_person(self, person):
+from .models import Person
 
 
-#         pass
+class PersonRepository:
+    def __init__(self):
+        self.__model = Person
+
+    def create(self, person_data):
+        return self.__model.objects.create(**person_data)

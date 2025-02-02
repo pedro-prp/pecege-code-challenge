@@ -2,14 +2,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Person
-
 
 # TODO: setup admin
 
-# TODO: Import the necessary modules
-# from .serializers import PersonSerializer
-# from .repositories import PersonRepository
+from .serializers import PersonSerializer
 from .services import PersonService
 
 
@@ -21,11 +17,6 @@ class PersonProcessSpreadsheetView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        # self.__repository = PersonRepository(
-        #     person_model=Person,
-        #     person_serializer=PersonSerializer,
-        # )
         self.__service = PersonService()
 
     def post(self, request):
@@ -35,10 +26,16 @@ class PersonProcessSpreadsheetView(APIView):
 
             processed_data = self.__service.process_spreadsheet(file)
 
+            print("PROCESSED DATA:", processed_data)
+
+            # serializer = PersonSerializer(data=processed_data, many=True)
+
+            # if serializer.is_valid():
             return Response(
                 data=processed_data,
-                status=status.HTTP_200_OK,
+                status=status.HTTP_201_CREATED,
             )
+
         except Exception as e:
             return Response(
                 data={"error": str(e)},

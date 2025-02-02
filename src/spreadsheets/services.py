@@ -1,13 +1,16 @@
 from openpyxl import load_workbook
 
-# from .repositories import PersonRepository
+from .repositories import PersonRepository
+from .serializers import PersonSerializer
+
 from .utils import calculate_age, calculate_value
+
+from datetime import datetime
 
 
 class PersonService:
     def __init__(self):
-        # self.__person_repository = person_repository
-        pass
+        self.__repository = PersonRepository()
 
     def process_spreadsheet(self, file):
         workbook = load_workbook(file)
@@ -22,16 +25,8 @@ class PersonService:
             try:
                 name, email, birth_date, is_active, _ = row
 
-                print(
-                    "Nome",
-                    name,
-                    "Email",
-                    email,
-                    "Data de Nascimento",
-                    birth_date,
-                    "Ativo",
-                    is_active,
-                )
+                if isinstance(birth_date, datetime):
+                    birth_date = birth_date.date()
 
                 age = calculate_age(birth_date)
 
@@ -43,12 +38,21 @@ class PersonService:
                 person = {
                     "name": name,
                     "email": email,
-                    "age": age,
+                    "birth_date": birth_date,
                     "is_active": is_active,
                     "value": value,
                 }
 
-                processed_data.append(person)
+                print("DATA:", person)
+
+                serializer = PersonSerializer(data=person)
+
+                if serializer.is_valid():
+                    self.__repository.create(serializer.validated_data)
+
+                if is_active:
+                    processed_data.append(person)
+
             except Exception as e:
                 print(f"Invalid processing row: {row}. Error: {e}")
                 continue
