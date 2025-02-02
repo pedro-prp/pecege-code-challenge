@@ -91,8 +91,8 @@ A aplicação possui os seguintes endpoints:
 ### 1. API de Planilhas(spreadsheets)
 | Método | Endpoint          | Descrição                           |
 |--------|-------------------|-------------------------------------|
-| GET    | /upload-planilha/   | Processa a planilha enviada e retorna as pessoas ativas, além de salvar os mesmos no banco de dados |
-| POST   | /download-planilha/ | Retorna as pessoas ativas no banco de dados no formato de Planilha(.xlsx)                           |
+| POST    | /upload-planilha/   | Processa a planilha enviada e retorna as pessoas ativas, além de salvar os mesmos no banco de dados |
+| GET   | /download-planilha/ | Retorna as pessoas ativas no banco de dados no formato de Planilha(.xlsx)                           |
 
 ## 📝 License
 
