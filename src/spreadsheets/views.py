@@ -12,8 +12,13 @@ from .exceptions import SpreadsheetHeaderException
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_schemas import get_upload_planilha_schema, get_download_planilha_schema
 
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 class PersonProcessSpreadsheetView(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,6 +64,8 @@ class PersonProcessSpreadsheetView(APIView):
 
 
 class PersonListSpreadsheetView(APIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

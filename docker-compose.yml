@@ -23,10 +23,6 @@ services:
     build:
       context: .
     container_name: django-app
-    command: >
-      sh -c "python ./src/manage.py makemigrations spreadsheets &&
-             python ./src/manage.py migrate &&
-             python ./src/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
