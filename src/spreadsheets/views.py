@@ -26,18 +26,32 @@ class PersonProcessSpreadsheetView(APIView):
 
             processed_data = self.__service.process_spreadsheet(file)
 
-            print("PROCESSED DATA:", processed_data)
+            serializer = PersonSerializer(data=processed_data, many=True)
 
-            # serializer = PersonSerializer(data=processed_data, many=True)
-
-            # if serializer.is_valid():
-            return Response(
-                data=processed_data,
-                status=status.HTTP_201_CREATED,
-            )
+            if serializer.is_valid():
+                return Response(
+                    data=serializer.data,
+                    status=status.HTTP_201_CREATED,
+                )
 
         except Exception as e:
             return Response(
-                data={"error": str(e)},
+                data={"Erro ao processar a planilha": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class PersonListSpreadsheetView(APIView):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.__service = PersonService()
+
+    def get(self, request):
+
+        data = self.__service.generate_spreadsheet()
+
+        return Response(
+            data=data,
+            status=status.HTTP_200_OK,
+        )

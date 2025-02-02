@@ -3,9 +3,6 @@ from datetime import date, datetime
 
 def calculate_age(birth_date):
 
-    print(birth_date)
-    print(type(birth_date))
-
     today = date.today()
     return (
         today.year

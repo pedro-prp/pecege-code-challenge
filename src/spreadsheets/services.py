@@ -43,18 +43,21 @@ class PersonService:
                     "value": value,
                 }
 
-                print("DATA:", person)
-
                 serializer = PersonSerializer(data=person)
 
                 if serializer.is_valid():
-                    self.__repository.create(serializer.validated_data)
+                    self.__repository.update_or_create(serializer.validated_data)
 
                 if is_active:
                     processed_data.append(person)
 
             except Exception as e:
-                print(f"Invalid processing row: {row}. Error: {e}")
+                print(f"Erro ao processar a linha: {row}. Error: {e}")
                 continue
 
         return processed_data
+
+    def generate_spreadsheet(self):
+        data = self.__repository.get_all()
+
+        return data
