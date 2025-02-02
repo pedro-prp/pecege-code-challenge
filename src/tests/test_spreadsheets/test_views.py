@@ -1,6 +1,6 @@
 from rest_framework import status
-from django.core.files.uploadedfile import SimpleUploadedFile
-from datetime import date
+
+from spreadsheets.models import Person
 
 from .factories import (
     ValidSpreadsheetFactory,
@@ -57,3 +57,43 @@ class TestPersonProcessSpreadsheetView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(len(response.data["result"]), 0)
+
+
+class TestPersonListSpreadsheetView(APITestCase):
+    def setUp(self):
+        Person.objects.create(
+            name="João Silva",
+            email="joao@example.com",
+            birth_date="2000-05-20",
+            is_active=True,
+            value=150.00,
+        )
+        Person.objects.create(
+            name="Maria Souza",
+            email="maria@example.com",
+            birth_date="2010-01-01",
+            is_active=False,
+            value=100.00,
+        )
+        Person.objects.create(
+            name="Carlos Oliveira",
+            email="carlos@example.com",
+            birth_date="1960-08-15",
+            is_active=True,
+            value=200.00,
+        )
+
+        self.url = "/planilhas/download-planilha/"
+
+    def test_download_spreadsheet_success(self):
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertIn(
+            "attachment; filename=pessoas.xlsx", response["Content-Disposition"]
+        )
